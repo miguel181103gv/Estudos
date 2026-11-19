@@ -185,39 +185,42 @@
         </div>
       </div>
 
-      <!-- Menuzinho Geral Retrátil na Escolha de Perfil -->
-      <div id="picker-global-cfg-panel" class="hidden max-w-2xl mx-auto rounded-2xl bg-[#141c31] border border-slate-700 p-4 sm:p-5 text-left space-y-3 shadow-2xl">
-        <div class="flex items-center justify-between border-b border-slate-700/80 pb-2">
-          <h3 class="text-xs sm:text-sm font-extrabold" style="color:#ffffff !important;">⚙️ Configuração Global (Vale para todos os perfis)</h3>
-          <button id="btn-close-picker-cfg" type="button" class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-300">✕</button>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div class="sm:col-span-2">
-            <label class="block text-[11px] font-semibold mb-1" style="color:#cbd5e1 !important;">✨ Chave da API do Gemini (Google AI Studio)</label>
-            <input id="picker-gemini-input" type="password" placeholder="Cole sua chave AIzaSy... aqui" class="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-xs text-white outline-none focus:border-sky-400" />
-          </div>
-          <div>
-            <label class="block text-[11px] font-semibold mb-1" style="color:#cbd5e1 !important;">☁️ URL Google Apps Script (opcional)</label>
-            <input id="picker-drive-url" type="url" placeholder="https://script.google.com/.../exec" class="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-xs text-white outline-none focus:border-sky-400" />
-          </div>
-          <div>
-            <label class="block text-[11px] font-semibold mb-1" style="color:#cbd5e1 !important;">🔒 Senha do Drive (opcional)</label>
-            <input id="picker-drive-token" type="password" placeholder="Sua senha do script" class="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-xs text-white outline-none focus:border-sky-400" />
-          </div>
-        </div>
-        <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
-          <button id="btn-picker-pull-drive" type="button" class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition">
-            ⬇️ Baixar dados do Drive
-          </button>
-          <button id="btn-picker-save-cfg" type="button" class="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-extrabold transition">
-            ✓ Salvar para todos os perfis
-          </button>
-        </div>
-      </div>
-
       <div id="profile-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 max-w-4xl mx-auto pb-4"></div>
     </div>
   </div>
+
+      <!-- Modal Global de Configuração (Gemini & Drive) -->
+      <div id="picker-global-cfg-panel" style="display:none;" class="fixed inset-0 z-[80] bg-black/80 backdrop-blur-sm items-center justify-center p-4">
+        <div class="w-full max-w-lg rounded-2xl bg-[#141c31] border border-slate-600 p-5 text-left space-y-4 shadow-2xl">
+          <div class="flex items-center justify-between border-b border-slate-700 pb-2.5">
+            <h3 class="text-sm font-extrabold" style="color:#ffffff !important;">⚙️ Configuração Global (Vale para todos os perfis)</h3>
+            <button id="btn-close-picker-cfg" type="button" class="w-7 h-7 rounded-full text-xs font-bold bg-slate-800 text-slate-200 flex items-center justify-center">✕</button>
+          </div>
+          <div class="grid grid-cols-1 gap-3">
+            <div>
+              <label class="block text-xs font-semibold mb-1" style="color:#cbd5e1 !important;">✨ Chave da API do Gemini (Google AI Studio)</label>
+              <input id="picker-gemini-input" type="password" placeholder="Cole sua chave AIzaSy... aqui" style="background:#0f172a !important; color:#ffffff !important; border-color:#334155 !important;" class="w-full rounded-xl border px-3 py-2.5 text-xs outline-none" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold mb-1" style="color:#cbd5e1 !important;">☁️ URL do Google Apps Script (termina em /exec)</label>
+              <input id="picker-drive-url" type="url" placeholder="https://script.google.com/macros/s/.../exec" style="background:#0f172a !important; color:#ffffff !important; border-color:#334155 !important;" class="w-full rounded-xl border px-3 py-2.5 text-xs outline-none" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold mb-1" style="color:#cbd5e1 !important;">🔒 Senha Secreta do Drive</label>
+              <input id="picker-drive-token" type="password" placeholder="A mesma senha do script" style="background:#0f172a !important; color:#ffffff !important; border-color:#334155 !important;" class="w-full rounded-xl border px-3 py-2.5 text-xs outline-none" />
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-700">
+            <button id="btn-picker-pull-drive" type="button" class="px-3.5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition">
+              ⬇️ Baixar dados do Drive
+            </button>
+            <button id="btn-picker-save-cfg" type="button" class="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-extrabold transition">
+              ✓ Salvar para todos os perfis
+            </button>
+          </div>
+        </div>
+      </div>
+
 
   <!-- Modal: Criar Novo Perfil a partir de Edital -->
   <div id="modal-new-profile" class="fixed inset-0 z-[70] bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
@@ -1320,7 +1323,7 @@
         <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
           <label class="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
             <input id="drive-auto-sync" type="checkbox" class="accent-blue-600 w-4 h-4 rounded" />
-            <span>Enviar automaticamente para o Drive após alterações</span>
+            <span>Sincronização 100% automática (envia ao editar e baixa ao abrir)</span>
           </label>
           <div class="flex flex-wrap items-center gap-2">
             <button id="btn-drive-save-cfg" type="button" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition">
@@ -2283,60 +2286,6 @@
         currentProfileId = 'trt';
       }
       renderProfilePickerCards();
-
-    function loadPickerCfgInputs() {
-      const gs = loadGlobalSettings();
-      const gIn = document.getElementById('picker-gemini-input');
-      const dUrl = document.getElementById('picker-drive-url');
-      const dTok = document.getElementById('picker-drive-token');
-      if (gIn) gIn.value = gs.geminiApiKey || (state && state.geminiApiKey) || '';
-      if (dUrl) dUrl.value = (gs.driveSync && gs.driveSync.url) || (state && state.driveSync && state.driveSync.url) || '';
-      if (dTok) dTok.value = (gs.driveSync && gs.driveSync.token) || (state && state.driveSync && state.driveSync.token) || '';
-    }
-
-    document.getElementById('btn-toggle-picker-cfg').addEventListener('click', () => {
-      const p = document.getElementById('picker-global-cfg-panel');
-      loadPickerCfgInputs();
-      p.classList.toggle('hidden');
-    });
-
-    document.getElementById('btn-close-picker-cfg').addEventListener('click', () => {
-      document.getElementById('picker-global-cfg-panel').classList.add('hidden');
-    });
-
-    document.getElementById('btn-picker-save-cfg').addEventListener('click', () => {
-      const key = (document.getElementById('picker-gemini-input').value || '').trim();
-      const url = (document.getElementById('picker-drive-url').value || '').trim();
-      const token = (document.getElementById('picker-drive-token').value || '').trim();
-      const curGs = loadGlobalSettings();
-      const newDrive = { ...(curGs.driveSync || {}), url, token };
-      saveGlobalSettings({ geminiApiKey: key, driveSync: newDrive });
-      if (state) {
-        state.geminiApiKey = key;
-        state.driveSync = { ...(state.driveSync || {}), ...newDrive };
-        saveState(true);
-      }
-      const gk = document.getElementById('cfg-gemini-key'); if (gk) gk.value = key;
-      const du = document.getElementById('drive-script-url'); if (du) du.value = url;
-      const dt = document.getElementById('drive-script-token'); if (dt) dt.value = token;
-      renderProfilePickerCards();
-      document.getElementById('picker-global-cfg-panel').classList.add('hidden');
-      showToast('Chave Gemini e Drive salvos globalmente para todos os perfis!', 'success');
-    });
-
-    document.getElementById('btn-picker-pull-drive').addEventListener('click', async () => {
-      const url = (document.getElementById('picker-drive-url').value || '').trim();
-      const token = (document.getElementById('picker-drive-token').value || '').trim();
-      if (!url || !token) {
-        showToast('Preencha a URL do script e a Senha do Drive.', 'warning');
-        return;
-      }
-      saveGlobalSettings({ driveSync: { ...(loadGlobalSettings().driveSync || {}), url, token } });
-      if (state) state.driveSync = { ...(state.driveSync || {}), url, token };
-      const du = document.getElementById('drive-script-url'); if (du) du.value = url;
-      const dt = document.getElementById('drive-script-token'); if (dt) dt.value = token;
-      await syncPullFromDrive();
-    });
       showToast('Perfil removido.', 'info');
     }
 
@@ -2555,7 +2504,7 @@
         cycleIndex: 0,
         targetPct: 80,
         theme: 'light',
-        driveSync: { url: '', token: '', autoSync: false, lastSync: '' },
+        driveSync: { url: '', token: '', autoSync: true, lastSync: '' },
         topicHighlights: {}, // { topicId: [ { id, text, page, color, createdAt } ] }
         geminiApiKey: '',
         savedReports: [], // { id, periodType, label, createdAt, metricsSummary, aiText }
@@ -2589,7 +2538,7 @@
           studyLogs: Array.isArray(parsed.studyLogs) ? parsed.studyLogs : [],
           studyMinutesByDay: parsed.studyMinutesByDay || {},
           examDate: parsed.examDate || '',
-          driveSync: { url: '', token: '', autoSync: false, lastSync: '', ...(parsed.driveSync || {}), ...(loadGlobalSettings().driveSync || {}) },
+          driveSync: { url: '', token: '', autoSync: true, lastSync: '', ...(parsed.driveSync || {}), ...(loadGlobalSettings().driveSync || {}) },
           topicHighlights: parsed.topicHighlights || {},
           geminiApiKey: loadGlobalSettings().geminiApiKey || parsed.geminiApiKey || '',
           savedReports: Array.isArray(parsed.savedReports) ? parsed.savedReports : [],
@@ -2606,14 +2555,18 @@
     function saveState(skipAutoSync = false) {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        if (!skipAutoSync) {
+          saveGlobalSettings({ localUpdatedAt: Date.now() });
+        }
       } catch (e) {
         showToast('Espaço local quase cheio! Exporte um backup JSON.', 'warning');
       }
-      if (!skipAutoSync && state.driveSync && state.driveSync.autoSync && state.driveSync.url && state.driveSync.token) {
+      const ds = (loadGlobalSettings().driveSync || state.driveSync || {});
+      if (!skipAutoSync && ds.autoSync !== false && ds.url && ds.token) {
         clearTimeout(driveAutoSyncTimer);
         driveAutoSyncTimer = setTimeout(() => {
           if (typeof syncPushToDrive === 'function') syncPushToDrive(true);
-        }, 3500);
+        }, 2800);
       }
     }
 
@@ -5442,6 +5395,59 @@
       return state.driveSync;
     }
 
+    function buildFullCloudBundle() {
+      const profilesData = {};
+      Object.values(PROFILES).forEach(p => {
+        try {
+          const raw = localStorage.getItem(p.storageKey);
+          if (raw) profilesData[p.id] = JSON.parse(raw);
+        } catch (e) {}
+      });
+      profilesData[currentProfileId] = { ...state };
+      const customProfiles = Object.values(PROFILES).filter(p => p.isCustom);
+      const gs = loadGlobalSettings();
+      return {
+        _bundleV2: true,
+        updatedAt: gs.localUpdatedAt || Date.now(),
+        activeProfileId: currentProfileId,
+        customProfiles,
+        profilesData,
+        globalSettings: {
+          geminiApiKey: gs.geminiApiKey || state.geminiApiKey || '',
+          theme: state.theme || 'light'
+        }
+      };
+    }
+
+    async function applyCloudBundle(cloudState, cloudImages) {
+      if (cloudState && cloudState._bundleV2) {
+        if (Array.isArray(cloudState.customProfiles)) {
+          cloudState.customProfiles.forEach(cp => {
+            if (cp && cp.id) saveCustomProfileToRegistry(cp);
+          });
+        }
+        const pData = cloudState.profilesData || {};
+        Object.entries(pData).forEach(([pid, stObj]) => {
+          if (PROFILES[pid] && stObj) {
+            try { localStorage.setItem(PROFILES[pid].storageKey, JSON.stringify(stObj)); } catch (e) {}
+          }
+        });
+        if (cloudState.globalSettings && cloudState.globalSettings.geminiApiKey) {
+          saveGlobalSettings({ geminiApiKey: cloudState.globalSettings.geminiApiKey });
+        }
+        saveGlobalSettings({ localUpdatedAt: cloudState.updatedAt || Date.now() });
+        state = loadState();
+      } else if (cloudState) {
+        const savedCfg = { ...state.driveSync };
+        state = { ...createDefaultState(), ...cloudState, driveSync: savedCfg };
+        saveState(true);
+      }
+
+      const imgs = cloudImages || {};
+      const tasks = Object.entries(imgs).map(([id, dataUrl]) => dbPutImage(id, dataUrl));
+      await Promise.all(tasks);
+    }
+
     async function syncPushToDrive(silent = false) {
       const ds = readDriveInputs();
       if (!ds.url || !ds.token) {
@@ -5453,16 +5459,16 @@
         return;
       }
       const stEl = document.getElementById('drive-sync-status');
-      if (stEl) stEl.textContent = 'Enviando para o Drive...';
+      if (stEl) stEl.textContent = 'Sincronizando...';
       try {
-        const cleanState = { ...state };
+        const bundle = buildFullCloudBundle();
         const res = await fetch(ds.url, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({
             token: ds.token,
             action: 'save',
-            state: cleanState,
+            state: bundle,
             images: { ...imageCache }
           })
         });
@@ -5470,54 +5476,65 @@
         if (!data || !data.ok) throw new Error((data && data.error) || 'Falha ao salvar no Drive');
         const nowStr = new Date().toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
         state.driveSync.lastSync = nowStr;
+        saveGlobalSettings({ driveSync: state.driveSync });
         saveState(true);
         updateDriveSyncUI();
-        if (!silent) showToast('Dados e imagens sincronizados no Google Drive!', 'success');
+        if (!silent) showToast('Todos os perfis e imagens sincronizados no Google Drive!', 'success');
       } catch (err) {
         updateDriveSyncUI();
         if (!silent) showToast('Erro ao enviar para o Drive: ' + (err.message || 'verifique URL/senha'), 'error');
       }
     }
 
-    async function syncPullFromDrive() {
-      const ds = readDriveInputs();
+    async function syncPullFromDrive(autoMode = false) {
+      const ds = autoMode ? (loadGlobalSettings().driveSync || state.driveSync || {}) : readDriveInputs();
       if (!ds.url || !ds.token) {
-        showToast('Informe a URL do Google Apps Script e a Senha Secreta.', 'warning');
+        if (!autoMode) showToast('Informe a URL do Google Apps Script e a Senha Secreta.', 'warning');
         return;
       }
       if (!ds.url.startsWith('https://')) {
-        showToast('A URL do script deve começar com https://', 'warning');
+        if (!autoMode) showToast('A URL do script deve começar com https://', 'warning');
         return;
       }
       const stEl = document.getElementById('drive-sync-status');
-      if (stEl) stEl.textContent = 'Baixando do Drive...';
+      if (stEl && !autoMode) stEl.textContent = 'Baixando do Drive...';
       try {
         const sep = ds.url.includes('?') ? '&' : '?';
         const res = await fetch(`${ds.url}${sep}action=load&token=${encodeURIComponent(ds.token)}`);
         const data = await res.json();
         if (!data || !data.ok) throw new Error((data && data.error) || 'Falha ao ler do Drive');
         if (!data.state) {
-          showToast('Nenhum backup encontrado ainda no Google Drive.', 'info');
+          if (!autoMode) showToast('Nenhum backup encontrado ainda no Google Drive.', 'info');
           updateDriveSyncUI();
           return;
         }
-        const savedCfg = { ...state.driveSync };
-        state = { ...createDefaultState(), ...data.state, driveSync: savedCfg };
-        const imgs = data.images || {};
-        const tasks = Object.entries(imgs).map(([id, dataUrl]) => dbPutImage(id, dataUrl));
-        await Promise.all(tasks);
+
+        // No modo automático ao abrir, só sobrescreve se a nuvem for mais recente (ou local vazio)
+        if (autoMode && data.state._bundleV2) {
+          const cloudTs = data.state.updatedAt || 0;
+          const localTs = loadGlobalSettings().localUpdatedAt || 0;
+          if (localTs > cloudTs) {
+            updateDriveSyncUI();
+            return;
+          }
+        }
+
+        await applyCloudBundle(data.state, data.images);
         const nowStr = new Date().toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
         state.driveSync.lastSync = nowStr;
+        saveGlobalSettings({ driveSync: state.driveSync });
         saveState(true);
+
+        if (typeof renderProfilePickerCards === 'function') renderProfilePickerCards();
         applyTheme(state.theme || 'light', false);
         initAllSelects();
         updateStorageInfoUI();
         updateDriveSyncUI();
         switchView(state.activeView || 'home');
-        showToast('Dados e imagens restaurados do Google Drive!', 'success');
+        showToast(autoMode ? '☁️ Dados atualizados automaticamente do Google Drive!' : 'Todos os perfis e imagens restaurados do Drive!', 'success');
       } catch (err) {
         updateDriveSyncUI();
-        showToast('Erro ao baixar do Drive: ' + (err.message || 'verifique URL/senha'), 'error');
+        if (!autoMode) showToast('Erro ao baixar do Drive: ' + (err.message || 'verifique URL/senha'), 'error');
       }
     }
 
@@ -5526,7 +5543,7 @@
       showToast('Configuração do Google Drive salva!', 'success');
     });
     document.getElementById('btn-drive-push').addEventListener('click', () => syncPushToDrive(false));
-    document.getElementById('btn-drive-pull').addEventListener('click', syncPullFromDrive);
+    document.getElementById('btn-drive-pull').addEventListener('click', () => syncPullFromDrive(false));
 
     // =========================================================================
     // HELPER CENTRAL: CHAMADA À API DO GEMINI + COPIAR TEXTO
@@ -6430,6 +6447,61 @@ ${rawText}`;
 
     renderProfilePickerCards();
 
+
+    function loadPickerCfgInputs() {
+      const gs = loadGlobalSettings();
+      const gIn = document.getElementById('picker-gemini-input');
+      const dUrl = document.getElementById('picker-drive-url');
+      const dTok = document.getElementById('picker-drive-token');
+      if (gIn) gIn.value = gs.geminiApiKey || (state && state.geminiApiKey) || '';
+      if (dUrl) dUrl.value = (gs.driveSync && gs.driveSync.url) || (state && state.driveSync && state.driveSync.url) || '';
+      if (dTok) dTok.value = (gs.driveSync && gs.driveSync.token) || (state && state.driveSync && state.driveSync.token) || '';
+    }
+
+    document.getElementById('btn-toggle-picker-cfg').addEventListener('click', () => {
+      const p = document.getElementById('picker-global-cfg-panel');
+      loadPickerCfgInputs();
+      p.style.display = 'flex';
+    });
+
+    document.getElementById('btn-close-picker-cfg').addEventListener('click', () => {
+      document.getElementById('picker-global-cfg-panel').style.display = 'none';
+    });
+
+    document.getElementById('btn-picker-save-cfg').addEventListener('click', () => {
+      const key = (document.getElementById('picker-gemini-input').value || '').trim();
+      const url = (document.getElementById('picker-drive-url').value || '').trim();
+      const token = (document.getElementById('picker-drive-token').value || '').trim();
+      const curGs = loadGlobalSettings();
+      const newDrive = { ...(curGs.driveSync || {}), url, token, autoSync: !!(url && token) };
+      saveGlobalSettings({ geminiApiKey: key, driveSync: newDrive });
+      if (state) {
+        state.geminiApiKey = key;
+        state.driveSync = { ...(state.driveSync || {}), ...newDrive };
+        saveState(true);
+      }
+      const gk = document.getElementById('cfg-gemini-key'); if (gk) gk.value = key;
+      const du = document.getElementById('drive-script-url'); if (du) du.value = url;
+      const dt = document.getElementById('drive-script-token'); if (dt) dt.value = token;
+      renderProfilePickerCards();
+      document.getElementById('picker-global-cfg-panel').style.display = 'none';
+      showToast('Chave Gemini e Drive salvos globalmente para todos os perfis!', 'success');
+    });
+
+    document.getElementById('btn-picker-pull-drive').addEventListener('click', async () => {
+      const url = (document.getElementById('picker-drive-url').value || '').trim();
+      const token = (document.getElementById('picker-drive-token').value || '').trim();
+      if (!url || !token) {
+        showToast('Preencha a URL do script e a Senha do Drive.', 'warning');
+        return;
+      }
+      saveGlobalSettings({ driveSync: { ...(loadGlobalSettings().driveSync || {}), url, token } });
+      if (state) state.driveSync = { ...(state.driveSync || {}), url, token };
+      const du = document.getElementById('drive-script-url'); if (du) du.value = url;
+      const dt = document.getElementById('drive-script-token'); if (dt) dt.value = token;
+      await syncPullFromDrive(false);
+    });
+
     // Init + Carga do Banco IndexedDB (abre mostrando o Seletor de Perfis estilo Netflix!)
     applyProfileHeaderUI();
     applyTheme(state.theme || 'light', false);
@@ -6453,6 +6525,12 @@ ${rawText}`;
       if (migrated) saveState();
       updateStorageInfoUI();
       if (state.activeView === 'my_errors') renderErrors();
+      // Auto-sync ao abrir o app (baixa do Drive se houver novidade)
+      const gsBoot = loadGlobalSettings();
+      const dBoot = gsBoot.driveSync || state.driveSync || {};
+      if (dBoot.autoSync !== false && dBoot.url && dBoot.token) {
+        syncPullFromDrive(true);
+      }
     });
   </script>
 </body>
