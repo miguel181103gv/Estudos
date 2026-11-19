@@ -2566,7 +2566,7 @@
         clearTimeout(driveAutoSyncTimer);
         driveAutoSyncTimer = setTimeout(() => {
           if (typeof syncPushToDrive === 'function') syncPushToDrive(true);
-        }, 2800);
+        }, 900);
       }
     }
 
@@ -5369,7 +5369,7 @@
       const stEl = document.getElementById('drive-sync-status');
       if (urlEl && !urlEl.value) urlEl.value = ds.url || '';
       if (tokEl && !tokEl.value) tokEl.value = ds.token || '';
-      if (autoEl) autoEl.checked = !!ds.autoSync;
+      if (autoEl) autoEl.checked = ds.autoSync !== false;
       if (stEl) {
         if (!ds.url || !ds.token) {
           stEl.textContent = 'Não configurado';
@@ -5448,8 +5448,10 @@
       await Promise.all(tasks);
     }
 
+    let isDriveSyncBusy = false;
     async function syncPushToDrive(silent = false) {
-      const ds = readDriveInputs();
+      if (isDriveSyncBusy) return;
+      const ds = silent ? (loadGlobalSettings().driveSync || state.driveSync || {}) : readDriveInputs();
       if (!ds.url || !ds.token) {
         if (!silent) showToast('Informe a URL do Google Apps Script e a Senha Secreta.', 'warning');
         return;
@@ -5460,6 +5462,7 @@
       }
       const stEl = document.getElementById('drive-sync-status');
       if (stEl) stEl.textContent = 'Sincronizando...';
+      isDriveSyncBusy = true;
       try {
         const bundle = buildFullCloudBundle();
         const res = await fetch(ds.url, {
@@ -5483,6 +5486,8 @@
       } catch (err) {
         updateDriveSyncUI();
         if (!silent) showToast('Erro ao enviar para o Drive: ' + (err.message || 'verifique URL/senha'), 'error');
+      } finally {
+        isDriveSyncBusy = false;
       }
     }
 
@@ -6525,12 +6530,21 @@ ${rawText}`;
       if (migrated) saveState();
       updateStorageInfoUI();
       if (state.activeView === 'my_errors') renderErrors();
-      // Auto-sync ao abrir o app (baixa do Drive se houver novidade)
-      const gsBoot = loadGlobalSettings();
-      const dBoot = gsBoot.driveSync || state.driveSync || {};
-      if (dBoot.autoSync !== false && dBoot.url && dBoot.token) {
-        syncPullFromDrive(true);
-      }
+      // Auto-sync ao abrir o app, ao voltar para a aba/iPhone e a cada 30s
+      const runAutoPullIfReady = () => {
+        if (isDriveSyncBusy) return;
+        const gsBoot = loadGlobalSettings();
+        const dBoot = gsBoot.driveSync || state.driveSync || {};
+        if (dBoot.autoSync !== false && dBoot.url && dBoot.token) {
+          syncPullFromDrive(true);
+        }
+      };
+      runAutoPullIfReady();
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') runAutoPullIfReady();
+      });
+      window.addEventListener('focus', runAutoPullIfReady);
+      setInterval(runAutoPullIfReady, 30000);
     });
   </script>
 </body>
