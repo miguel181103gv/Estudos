@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Caderno de Erros - TRT | Painel Completo TJAA</title>
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -16,6 +16,17 @@
   <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <style>
+    html, body { max-width: 100%; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
+    @media (max-width: 767px) {
+      input, select, textarea { font-size: 16px !important; }
+    }
+    .mobile-topbar {
+      padding-top: max(0.75rem, env(safe-area-inset-top));
+      background: #232a3e !important;
+      color: #ffffff !important;
+      border-bottom: 1px solid rgba(255,255,255,0.12) !important;
+    }
+    .mobile-topbar * { color: #ffffff !important; }
     body { font-family: 'Inter', system-ui, -apple-system, sans-serif; transition: background-color 0.2s ease, color 0.2s ease; }
     h1, h2, h3 { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; letter-spacing: -0.015em; }
     .nav-btn { transition: all 0.16s ease; }
@@ -48,6 +59,7 @@
     html[data-theme="light"] .sidebar-bg .bg-slate-900\/90, html:not([data-theme]) .sidebar-bg .bg-slate-900\/90 { background: rgba(15, 23, 42, 0.55) !important; border-color: rgba(255,255,255,0.10) !important; }
     html[data-theme="light"] .sidebar-bg #timer-display, html:not([data-theme]) .sidebar-bg #timer-display { color: #ffffff !important; }
     html[data-theme="light"] .sidebar-bg .text-slate-300, html:not([data-theme]) .sidebar-bg .text-slate-300 { color: #e2e8f0 !important; }
+    html[data-theme="light"] .sidebar-bg #btn-open-profile-picker, html:not([data-theme]) .sidebar-bg #btn-open-profile-picker, html[data-theme="light"] .sidebar-bg #btn-open-profile-picker *, html:not([data-theme]) .sidebar-bg #btn-open-profile-picker * { color: #f8fafc !important; }
     html[data-theme="light"] .sidebar-bg .text-slate-400, html:not([data-theme]) .sidebar-bg .text-slate-400 { color: #94a3b8 !important; }
     .kpi-vivid { position: relative; overflow: hidden; border: none !important; color: #ffffff !important; box-shadow: 0 8px 20px -4px rgba(15, 23, 42, 0.16); transition: transform 0.18s ease, box-shadow 0.18s ease; }
     .kpi-vivid:hover { transform: translateY(-2px); box-shadow: 0 12px 24px -4px rgba(15, 23, 42, 0.22); }
@@ -156,16 +168,54 @@
 </head>
 <body class="min-h-screen flex flex-col lg:flex-row overflow-x-hidden">
 
-  <!-- Tela de Seleção de Perfil (Estilo Netflix) -->
-  <div id="profile-picker-overlay" class="fixed inset-0 z-[60] bg-[#0b1020] flex flex-col items-center justify-center p-6 text-center">
-    <div class="max-w-3xl w-full space-y-8">
+  <!-- Tela de Seleção de Perfil (Estilo Netflix + Menu Geral de API/Drive) -->
+  <div id="profile-picker-overlay" class="fixed inset-0 z-[60] bg-[#0b1020] overflow-y-auto custom-scroll px-4 pb-10" style="padding-top: max(1.5rem, env(safe-area-inset-top)); -webkit-overflow-scrolling: touch;">
+    <div class="max-w-4xl w-full mx-auto space-y-6 text-center">
       <div class="space-y-2">
-        <span class="inline-block px-3 py-1 rounded-full bg-white/10 border border-white/15 text-sky-300 text-xs font-bold tracking-wide uppercase">Central de Concursos · Miguel</span>
-        <h1 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight" style="color:#ffffff !important;">Qual foco vamos estudar hoje?</h1>
-        <p class="text-sm text-slate-400" style="color:#94a3b8 !important;">Cada perfil mantém seu próprio edital, ciclo de estudos, mapa de acertos, caderno de erros e metas separados.</p>
+        <span class="inline-block px-3 py-1 rounded-full bg-white/10 border border-white/15 text-sky-300 text-[11px] sm:text-xs font-bold tracking-wide uppercase">Central de Concursos · Miguel</span>
+        <h1 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight" style="color:#ffffff !important;">Qual foco vamos estudar hoje?</h1>
+        <p class="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto" style="color:#94a3b8 !important;">Cada perfil mantém seu próprio edital, ciclo, mapa de acertos e caderno de erros. A chave do Gemini e o Drive valem para todos.</p>
+
+        <!-- Menuzinho Geral Rápido (Chave Gemini + Drive + Baixar) -->
+        <div class="pt-2 max-w-2xl mx-auto rounded-2xl bg-[#141c31]/90 border border-slate-700/80 p-3 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 text-left">
+          <span id="picker-gemini-badge" class="text-[11px] sm:text-xs font-semibold px-2" style="color:#cbd5e1 !important;"></span>
+          <button id="btn-toggle-picker-cfg" type="button" class="px-3.5 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-extrabold transition shrink-0 text-center">
+            ⚙️ Chave Gemini &amp; Google Drive
+          </button>
+        </div>
       </div>
 
-      <div id="profile-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-4xl mx-auto"></div>
+      <!-- Menuzinho Geral Retrátil na Escolha de Perfil -->
+      <div id="picker-global-cfg-panel" class="hidden max-w-2xl mx-auto rounded-2xl bg-[#141c31] border border-slate-700 p-4 sm:p-5 text-left space-y-3 shadow-2xl">
+        <div class="flex items-center justify-between border-b border-slate-700/80 pb-2">
+          <h3 class="text-xs sm:text-sm font-extrabold" style="color:#ffffff !important;">⚙️ Configuração Global (Vale para todos os perfis)</h3>
+          <button id="btn-close-picker-cfg" type="button" class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-300">✕</button>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="sm:col-span-2">
+            <label class="block text-[11px] font-semibold mb-1" style="color:#cbd5e1 !important;">✨ Chave da API do Gemini (Google AI Studio)</label>
+            <input id="picker-gemini-input" type="password" placeholder="Cole sua chave AIzaSy... aqui" class="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-xs text-white outline-none focus:border-sky-400" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold mb-1" style="color:#cbd5e1 !important;">☁️ URL Google Apps Script (opcional)</label>
+            <input id="picker-drive-url" type="url" placeholder="https://script.google.com/.../exec" class="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-xs text-white outline-none focus:border-sky-400" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold mb-1" style="color:#cbd5e1 !important;">🔒 Senha do Drive (opcional)</label>
+            <input id="picker-drive-token" type="password" placeholder="Sua senha do script" class="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-xs text-white outline-none focus:border-sky-400" />
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+          <button id="btn-picker-pull-drive" type="button" class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition">
+            ⬇️ Baixar dados do Drive
+          </button>
+          <button id="btn-picker-save-cfg" type="button" class="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-extrabold transition">
+            ✓ Salvar para todos os perfis
+          </button>
+        </div>
+      </div>
+
+      <div id="profile-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 max-w-4xl mx-auto pb-4"></div>
     </div>
   </div>
 
@@ -175,75 +225,76 @@
       <div class="flex items-center justify-between pb-3 border-b border-slate-700">
         <div>
           <h3 class="text-lg font-extrabold" style="color:#ffffff !important;">➕ Criar Novo Perfil de Concurso</h3>
-          <p class="text-xs" style="color:#94a3b8 !important;">Envie o PDF do edital (ou cole as matérias) e o sistema monta todo o painel automaticamente.</p>
+          <p class="text-xs" style="color:#94a3b8 !important;">Anexe o PDF do edital primeiro: o Gemini lê e preenche cargo, salário, data da prova e todas as matérias separadas.</p>
         </div>
         <button id="close-new-profile-modal" type="button" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-bold flex items-center justify-center">✕</button>
       </div>
 
-      <form id="new-profile-form" class="space-y-3.5">
-        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
-          <div>
-            <label class="block text-xs font-semibold mb-1" style="color:#cbd5e1 !important;">Ícone</label>
-            <select id="np-icon" class="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-sm text-white outline-none">
-              <option value="🎯">🎯 Alvo</option>
-              <option value="🏛️">🏛️ Tribunal / Órgão</option>
-              <option value="🛡️">🛡️ Policial</option>
-              <option value="💼">💼 Fiscal / Adm</option>
-              <option value="🏥">🏥 Saúde / INSS</option>
-              <option value="📚">📚 Educação</option>
-            </select>
-          </div>
-          <div class="sm:col-span-2">
-            <label class="block text-xs font-semibold mb-1" style="color:#cbd5e1 !important;">Nome do Perfil / Concurso</label>
-            <input id="np-name" type="text" required placeholder="Ex: INSS, TJ-MG, Polícia Federal..." class="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-xs text-white outline-none focus:border-sky-400" />
-          </div>
-          <div>
-            <label class="block text-xs font-semibold mb-1" style="color:#cbd5e1 !important;">Cargo</label>
-            <input id="np-cargo" type="text" required placeholder="Ex: Técnico do Seguro" class="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-xs text-white outline-none focus:border-sky-400" />
-          </div>
-        </div>
-
-        <!-- Dados Motivacionais Opcionais -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-3 rounded-xl bg-slate-900/60 border border-slate-700/70">
-          <div>
-            <label class="block text-[11px] font-semibold mb-1" style="color:#94a3b8 !important;">Salário Base</label>
-            <input id="np-salary" type="text" placeholder="Ex: R$ 6.500,00" class="w-full rounded-lg bg-slate-950 border border-slate-700 px-2.5 py-1.5 text-xs text-white outline-none" />
-          </div>
-          <div>
-            <label class="block text-[11px] font-semibold mb-1" style="color:#94a3b8 !important;">Vale (VR+VA)</label>
-            <input id="np-vale" type="text" placeholder="Ex: R$ 1.200,00" class="w-full rounded-lg bg-slate-950 border border-slate-700 px-2.5 py-1.5 text-xs text-white outline-none" />
-          </div>
-          <div>
-            <label class="block text-[11px] font-semibold mb-1" style="color:#94a3b8 !important;">Jornada</label>
-            <input id="np-jornada" type="text" placeholder="Ex: 40h/sem" class="w-full rounded-lg bg-slate-950 border border-slate-700 px-2.5 py-1.5 text-xs text-white outline-none" />
-          </div>
-          <div>
-            <label class="block text-[11px] font-semibold mb-1" style="color:#94a3b8 !important;">Status</label>
-            <input id="np-status" type="text" placeholder="Ex: Previsto 2027" class="w-full rounded-lg bg-slate-950 border border-slate-700 px-2.5 py-1.5 text-xs text-white outline-none" />
-          </div>
-        </div>
-
-        <!-- Upload do PDF do Edital -->
-        <div class="p-3.5 rounded-xl bg-sky-950/40 border border-sky-500/30 space-y-2">
-          <div class="flex flex-wrap items-center justify-between gap-2">
+      <form id="new-profile-form" class="space-y-4">
+        <!-- PASSO 1: ANEXAR PDF DO EDITAL PRIMEIRO -->
+        <div class="p-4 rounded-2xl bg-sky-950/50 border-2 border-dashed border-sky-500/40 space-y-2.5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <p class="text-xs font-bold" style="color:#7dd3fc !important;">📄 Importar do PDF do Edital (Automático)</p>
-              <p class="text-[11px]" style="color:#94a3b8 !important;">O app lê o PDF e organiza as matérias abaixo (usa Gemini se a chave API estiver configurada, ou parser local).</p>
+              <p class="text-sm font-extrabold" style="color:#7dd3fc !important;">1º Passo: Anexar PDF do Edital</p>
+              <p class="text-xs mt-0.5" style="color:#cbd5e1 !important;">A IA analisa o edital e preenche automaticamente os dados abaixo.</p>
             </div>
-            <label class="px-3 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold cursor-pointer transition shrink-0">
+            <label class="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-extrabold cursor-pointer transition shrink-0 text-center shadow-md">
               📎 Escolher PDF do Edital
               <input id="np-edital-pdf" type="file" accept="application/pdf" class="hidden" />
             </label>
           </div>
-          <p id="np-pdf-status" class="hidden text-[11px] font-semibold" style="color:#34d399 !important;"></p>
+          <p id="np-pdf-status" class="hidden text-xs font-semibold pt-1" style="color:#34d399 !important;"></p>
         </div>
 
-        <!-- Matérias e Tópicos do Edital -->
+        <!-- PASSO 2: DADOS EXTRAÍDOS / EDITÁVEIS -->
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+          <div>
+            <label class="block text-xs font-semibold mb-1" style="color:#cbd5e1 !important;">Ícone</label>
+            <select id="np-icon" class="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-sm text-white outline-none">
+              <option value="🏛️">🏛️ Câmara / Órgão</option>
+              <option value="🎯">🎯 Alvo</option>
+              <option value="⚖️">⚖️ Tribunal</option>
+              <option value="🛡️">🛡️ Policial</option>
+              <option value="💼">💼 Fiscal / TI</option>
+              <option value="🏥">🏥 Saúde / INSS</option>
+            </select>
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-semibold mb-1" style="color:#cbd5e1 !important;">Nome do Concurso / Órgão</label>
+            <input id="np-name" type="text" required placeholder="Preenchido pelo PDF ou digite aqui..." class="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-xs text-white outline-none focus:border-sky-400" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1" style="color:#cbd5e1 !important;">Cargo</label>
+            <input id="np-cargo" type="text" required placeholder="Ex: Téc. Informática" class="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-xs text-white outline-none focus:border-sky-400" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5 p-3 rounded-xl bg-slate-900/60 border border-slate-700/70">
+          <div>
+            <label class="block text-[11px] font-semibold mb-1" style="color:#94a3b8 !important;">Salário Base</label>
+            <input id="np-salary" type="text" placeholder="R$ ..." class="w-full rounded-lg bg-slate-950 border border-slate-700 px-2.5 py-1.5 text-xs text-white outline-none" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold mb-1" style="color:#94a3b8 !important;">Vale (VR+VA)</label>
+            <input id="np-vale" type="text" placeholder="R$ ..." class="w-full rounded-lg bg-slate-950 border border-slate-700 px-2.5 py-1.5 text-xs text-white outline-none" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold mb-1" style="color:#94a3b8 !important;">Jornada</label>
+            <input id="np-jornada" type="text" placeholder="Ex: 30h/sem" class="w-full rounded-lg bg-slate-950 border border-slate-700 px-2.5 py-1.5 text-xs text-white outline-none" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold mb-1" style="color:#94a3b8 !important;">Data da Prova</label>
+            <input id="np-exam-date" type="date" class="w-full rounded-lg bg-slate-950 border border-slate-700 px-2 py-1.5 text-xs text-white outline-none" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold mb-1" style="color:#94a3b8 !important;">Status</label>
+            <input id="np-status" type="text" placeholder="Edital aberto" class="w-full rounded-lg bg-slate-950 border border-slate-700 px-2.5 py-1.5 text-xs text-white outline-none" />
+          </div>
+        </div>
+
         <div>
-          <label class="block text-xs font-semibold mb-1" style="color:#cbd5e1 !important;">Matérias e Tópicos do Edital (1 matéria por linha no formato <code class="text-sky-300">Matéria: Tópico 1; Tópico 2; Tópico 3</code>)</label>
-          <textarea id="np-syllabus-text" rows="7" required placeholder="Língua Portuguesa: Interpretação de textos; Crase; Concordância; Regência; Pontuação
-Direito Constitucional: Princípios Fundamentais; Direitos e Garantias (Art. 5º); Administração Pública
-Direito Previdenciário: Seguridade Social; Segurados; Benefícios; Custeio" class="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2.5 text-xs text-white font-mono outline-none focus:border-sky-400"></textarea>
+          <label class="block text-xs font-semibold mb-1" style="color:#cbd5e1 !important;">Matérias e Tópicos Separados (<code class="text-sky-300">Matéria: Tópico 1; Tópico 2; ...</code>)</label>
+          <textarea id="np-syllabus-text" rows="8" required placeholder="As matérias e tópicos extraídos do PDF aparecerão aqui organizados um por linha..." class="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2.5 text-xs text-white font-mono outline-none focus:border-sky-400"></textarea>
         </div>
 
         <div class="flex justify-end gap-2 pt-2">
@@ -260,7 +311,7 @@ Direito Previdenciário: Seguridade Social; Segurados; Benefícios; Custeio" cla
   <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
   <!-- Mobile Header -->
-  <div class="lg:hidden flex items-center justify-between px-4 py-3 sidebar-bg border-b border-slate-800 sticky top-0 z-40">
+  <div class="lg:hidden mobile-topbar flex items-center justify-between px-4 pb-3 sticky top-0 z-40">
     <div class="flex items-center gap-2.5">
       <span class="text-lg">📕</span>
       <span class="font-bold text-sm text-white">Caderno de Erros - TRT</span>
@@ -394,36 +445,36 @@ Direito Previdenciário: Seguridade Social; Segurados; Benefícios; Custeio" cla
   </aside>
 
   <!-- Main Viewport -->
-  <main class="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 max-w-[1440px] w-full mx-auto">
+  <main class="flex-1 min-w-0 p-3.5 sm:p-6 lg:p-8 max-w-[1440px] w-full mx-auto overflow-x-hidden">
 
     <!-- ==================== VIEW 1: INÍCIO ==================== -->
     <section id="view-home" class="view-section space-y-6">
-      <!-- Hero Editorial Banner (Estilo plataforma real) -->
-      <div class="hero-banner rounded-3xl p-6 sm:p-7 relative overflow-hidden">
-        <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-          <div class="space-y-1.5">
-            <div class="flex flex-wrap items-center gap-2">
-              <span id="home-greeting-badge" class="hero-pill px-2.5 py-0.5 rounded-full text-[11px] font-semibold">TRT-MG · TJAA</span>
-              <span id="home-countdown-pill" class="hidden hero-pill px-2.5 py-0.5 rounded-full text-[11px] font-semibold"></span>
-              <span id="home-streak-pill" class="hero-pill px-2.5 py-0.5 rounded-full text-[11px] font-semibold">Ofensiva: 0 dias</span>
+      <!-- Hero Editorial Banner (Responsivo para iPhone e Desktop) -->
+      <div class="hero-banner rounded-2xl sm:rounded-3xl p-4 sm:p-7 relative overflow-hidden">
+        <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-5">
+          <div class="space-y-1.5 min-w-0">
+            <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+              <span id="home-greeting-badge" class="hero-pill px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold">TRT-MG · TJAA</span>
+              <span id="home-countdown-pill" class="hidden hero-pill px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold"></span>
+              <span id="home-streak-pill" class="hero-pill px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold">Ofensiva: 0 dias</span>
             </div>
-            <h2 id="home-greeting-title" class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">Bom dia, Miguel!</h2>
-            <p class="hero-muted text-xs sm:text-sm max-w-xl">Aqui está o seu plano de hoje sincronizado com a ordem do seu Ciclo de Estudos, suas revisões pendentes e sua evolução em questões.</p>
+            <h2 id="home-greeting-title" class="text-xl sm:text-3xl font-extrabold tracking-tight text-white">Bom dia, Miguel!</h2>
+            <p class="hero-muted text-xs sm:text-sm max-w-xl leading-relaxed">Seu plano de hoje sincronizado com a ordem do Ciclo, suas revisões e evolução em questões.</p>
           </div>
-          <div class="flex flex-wrap items-center gap-2.5 shrink-0">
-            <button data-jump="cycle" class="jump-btn hero-btn-primary px-4 py-2.5 rounded-xl text-xs transition shadow-md flex items-center gap-1.5">
+          <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 shrink-0 w-full lg:w-auto">
+            <button data-jump="cycle" class="col-span-2 sm:col-span-1 jump-btn hero-btn-primary px-4 py-2.5 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1.5">
               <i data-lucide="play" class="w-3.5 h-3.5"></i> Ir para o Ciclo
             </button>
-            <button data-jump="study_log" class="jump-btn hero-btn-ghost px-3.5 py-2.5 rounded-xl text-xs font-semibold transition">
+            <button data-jump="study_log" class="jump-btn hero-btn-ghost px-3 py-2 rounded-xl text-xs font-semibold transition text-center">
               Registrar Estudos
             </button>
-            <button data-jump="register_error" class="jump-btn hero-btn-ghost px-3.5 py-2.5 rounded-xl text-xs font-semibold transition">
+            <button data-jump="register_error" class="jump-btn hero-btn-ghost px-3 py-2 rounded-xl text-xs font-semibold transition text-center">
               Novo Erro
             </button>
-            <button data-jump="reviews" class="jump-btn hero-btn-ghost px-3.5 py-2.5 rounded-xl text-xs font-semibold transition">
+            <button data-jump="reviews" class="jump-btn hero-btn-ghost px-3 py-2 rounded-xl text-xs font-semibold transition text-center">
               Revisões (<span id="home-due-count">0</span>)
             </button>
-            <button data-jump="heatmap" class="jump-btn hero-btn-ghost px-3.5 py-2.5 rounded-xl text-xs font-semibold transition">
+            <button data-jump="heatmap" class="jump-btn hero-btn-ghost px-3 py-2 rounded-xl text-xs font-semibold transition text-center">
               Mapa de Acertos
             </button>
           </div>
@@ -432,25 +483,25 @@ Direito Previdenciário: Seguridade Social; Segurados; Benefícios; Custeio" cla
 
       <!-- 4 Cards KPI Vibrantes (Estilo MeuOrganizado) -->
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="kpi-vivid kpi-blue rounded-2xl p-4 sm:p-5">
+        <div class="min-w-0 kpi-vivid kpi-blue rounded-2xl p-4 sm:p-5">
           <p class="text-xs font-semibold kpi-sub">Questões Resolvidas</p>
           <p id="kpi-total-q" class="text-2xl sm:text-3xl font-extrabold mt-2 tabular-nums">0</p>
           <p id="kpi-total-c" class="text-[11px] kpi-sub mt-1">0 acertos no total</p>
           <i data-lucide="layers" class="kpi-wm w-14 h-14"></i>
         </div>
-        <div class="kpi-vivid kpi-amber rounded-2xl p-4 sm:p-5">
+        <div class="min-w-0 kpi-vivid kpi-amber rounded-2xl p-4 sm:p-5">
           <p class="text-xs font-semibold kpi-sub">Aproveitamento Geral</p>
           <p id="kpi-avg-pct" class="text-2xl sm:text-3xl font-extrabold mt-2 tabular-nums">—</p>
           <p id="kpi-avg-hint" class="text-[11px] kpi-sub mt-1">Meta configurada: 80%</p>
           <i data-lucide="layout-grid" class="kpi-wm w-14 h-14"></i>
         </div>
-        <div class="kpi-vivid kpi-coral rounded-2xl p-4 sm:p-5">
+        <div class="min-w-0 kpi-vivid kpi-coral rounded-2xl p-4 sm:p-5">
           <p class="text-xs font-semibold kpi-sub">Erros Pendentes</p>
           <p id="kpi-errors-pending" class="text-2xl sm:text-3xl font-extrabold mt-2 tabular-nums">0</p>
           <p id="kpi-errors-total" class="text-[11px] kpi-sub mt-1">0 pendentes · 0 dominados</p>
           <i data-lucide="archive" class="kpi-wm w-14 h-14"></i>
         </div>
-        <div class="kpi-vivid kpi-green rounded-2xl p-4 sm:p-5">
+        <div class="min-w-0 kpi-vivid kpi-green rounded-2xl p-4 sm:p-5">
           <p class="text-xs font-semibold kpi-sub">Assuntos Vistos</p>
           <p id="kpi-topics-done" class="text-2xl sm:text-3xl font-extrabold mt-2 tabular-nums">0%</p>
           <p id="kpi-topics-count" class="text-[11px] kpi-sub mt-1">0 de 0 tópicos estudados</p>
@@ -487,7 +538,7 @@ Direito Previdenciário: Seguridade Social; Segurados; Benefícios; Custeio" cla
       <!-- BLOCO PRINCIPAL SINCRONIZADO: O que estudar hoje (do Ciclo) + Revisões de Hoje -->
       <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
         <!-- O que estudar hoje (7 cols) -->
-        <div class="xl:col-span-7 panel-bg rounded-2xl border border-slate-800 p-5 space-y-4">
+        <div class="min-w-0 xl:col-span-7 panel-bg rounded-2xl border border-slate-800 p-5 space-y-4">
           <div class="flex items-center justify-between gap-2 pb-2 border-b border-slate-800">
             <div>
               <h3 class="text-sm font-bold text-white flex items-center gap-2">
@@ -501,7 +552,7 @@ Direito Previdenciário: Seguridade Social; Segurados; Benefícios; Custeio" cla
         </div>
 
         <!-- Revisões de Hoje (5 cols) -->
-        <div class="xl:col-span-5 panel-bg rounded-2xl border border-slate-800 p-5 space-y-4">
+        <div class="min-w-0 xl:col-span-5 panel-bg rounded-2xl border border-slate-800 p-5 space-y-4">
           <div class="flex items-center justify-between gap-2 pb-2 border-b border-slate-800">
             <div>
               <h3 class="text-sm font-bold text-white flex items-center gap-2">
@@ -517,7 +568,7 @@ Direito Previdenciário: Seguridade Social; Segurados; Benefícios; Custeio" cla
 
       <!-- MINI-GRÁFICO DE QUESTÕES (7 DIAS) + LANÇAMENTO RÁPIDO -->
       <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
-        <div class="xl:col-span-7 panel-bg rounded-2xl border border-slate-800 p-5 space-y-3">
+        <div class="min-w-0 xl:col-span-7 panel-bg rounded-2xl border border-slate-800 p-5 space-y-3">
           <div class="flex items-center justify-between">
             <div>
               <h3 class="text-sm font-bold text-white">Ritmo de Questões (Últimos 7 dias)</h3>
@@ -528,7 +579,7 @@ Direito Previdenciário: Seguridade Social; Segurados; Benefícios; Custeio" cla
           <div class="relative h-52"><canvas id="chart-home-questions"></canvas></div>
         </div>
 
-        <div class="xl:col-span-5 panel-bg rounded-2xl border border-slate-800 p-5 space-y-3">
+        <div class="min-w-0 xl:col-span-5 panel-bg rounded-2xl border border-slate-800 p-5 space-y-3">
           <h3 class="text-sm font-bold text-white">Lançamento Rápido de Questões</h3>
           <p class="text-xs text-slate-400">Atualiza na hora o Mapa de Acertos e a Agenda de Revisões.</p>
           <form id="quick-q-form" class="space-y-2.5">
@@ -540,10 +591,10 @@ Direito Previdenciário: Seguridade Social; Segurados; Benefícios; Custeio" cla
               <label class="block text-[11px] font-semibold text-slate-400 mb-1">Tópico do Edital</label>
               <select id="qq-topic" class="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-xs text-slate-100 outline-none focus:border-blue-500"></select>
             </div>
-            <div class="grid grid-cols-3 gap-2 pt-1">
-              <input id="qq-made" type="number" min="1" required placeholder="Feitas" class="w-full rounded-xl bg-slate-900 border border-slate-700 px-2.5 py-2 text-xs text-slate-100 outline-none focus:border-blue-500" />
-              <input id="qq-correct" type="number" min="0" required placeholder="Acertos" class="w-full rounded-xl bg-slate-900 border border-slate-700 px-2.5 py-2 text-xs text-slate-100 outline-none focus:border-blue-500" />
-              <button type="submit" class="w-full px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition">Salvar</button>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1">
+              <input id="qq-made" type="number" min="1" required placeholder="Feitas" class="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-xs text-slate-100 outline-none focus:border-blue-500" />
+              <input id="qq-correct" type="number" min="0" required placeholder="Acertos" class="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-xs text-slate-100 outline-none focus:border-blue-500" />
+              <button type="submit" class="col-span-2 sm:col-span-1 w-full px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition">Salvar</button>
             </div>
           </form>
         </div>
@@ -551,7 +602,7 @@ Direito Previdenciário: Seguridade Social; Segurados; Benefícios; Custeio" cla
 
       <!-- Prioridades & Últimas Baterias -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="panel-bg rounded-2xl border border-slate-800 p-5">
+        <div class="min-w-0 panel-bg rounded-2xl border border-slate-800 p-5">
           <div class="flex items-center justify-between mb-3">
             <h3 class="text-sm font-bold text-white">Top 5 Prioridades de Revisão</h3>
             <button data-jump="priority" class="jump-btn text-xs text-amber-600 font-semibold hover:underline">Ver todas →</button>
@@ -559,7 +610,7 @@ Direito Previdenciário: Seguridade Social; Segurados; Benefícios; Custeio" cla
           <div id="home-top-priorities" class="space-y-2 text-xs"></div>
         </div>
 
-        <div class="panel-bg rounded-2xl border border-slate-800 p-5">
+        <div class="min-w-0 panel-bg rounded-2xl border border-slate-800 p-5">
           <div class="flex items-center justify-between mb-3">
             <h3 class="text-sm font-bold text-white">Últimas Baterias Lançadas</h3>
             <button data-jump="evolution" class="jump-btn text-xs text-blue-600 font-semibold hover:underline">Ver gráficos →</button>
@@ -714,7 +765,7 @@ Direito Previdenciário: Seguridade Social; Segurados; Benefícios; Custeio" cla
       </div>
 
       <!-- Quick Schedule Form -->
-      <div class="panel-bg rounded-2xl border border-slate-800 p-5">
+      <div class="min-w-0 panel-bg rounded-2xl border border-slate-800 p-5">
         <h3 class="text-sm font-bold text-white mb-1">➕ Registrar tópico estudado (gera revisões de 1, 7 e 30 dias)</h3>
         <p class="text-xs text-slate-400 mb-3">Escolha o tópico que você estudou hoje (ou em outra data) para criar os 3 marcos de revisão na agenda.</p>
         <form id="review-schedule-form" class="grid grid-cols-1 md:grid-cols-6 gap-3">
@@ -1168,7 +1219,7 @@ Direito Previdenciário: Seguridade Social; Segurados; Benefícios; Custeio" cla
         <p class="text-xs text-slate-400 mt-0.5">Registre seus simulados completos (Conhecimentos Gerais + Específicos + Discursiva) para acompanhar a evolução rumo à prova.</p>
       </div>
 
-      <div class="panel-bg rounded-2xl border border-slate-800 p-5">
+      <div class="min-w-0 panel-bg rounded-2xl border border-slate-800 p-5">
         <form id="simulado-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
           <div>
             <label class="block text-[11px] font-semibold text-slate-400 mb-1">Data</label>
@@ -2183,6 +2234,22 @@ Direito Previdenciário: Seguridade Social; Segurados; Benefícios; Custeio" cla
 
     const LAST_PROFILE_KEY = 'concursos_last_profile_v1';
     const CUSTOM_PROFILES_KEY = 'concursos_custom_profiles_v1';
+    const GLOBAL_SETTINGS_KEY = 'concursos_global_settings_v1';
+
+    function loadGlobalSettings() {
+      try {
+        const raw = localStorage.getItem(GLOBAL_SETTINGS_KEY);
+        return raw ? JSON.parse(raw) : {};
+      } catch (e) { return {}; }
+    }
+
+    function saveGlobalSettings(partial) {
+      try {
+        const cur = loadGlobalSettings();
+        const merged = { ...cur, ...partial };
+        localStorage.setItem(GLOBAL_SETTINGS_KEY, JSON.stringify(merged));
+      } catch (e) {}
+    }
 
     function loadCustomProfilesIntoRegistry() {
       try {
@@ -2216,6 +2283,60 @@ Direito Previdenciário: Seguridade Social; Segurados; Benefícios; Custeio" cla
         currentProfileId = 'trt';
       }
       renderProfilePickerCards();
+
+    function loadPickerCfgInputs() {
+      const gs = loadGlobalSettings();
+      const gIn = document.getElementById('picker-gemini-input');
+      const dUrl = document.getElementById('picker-drive-url');
+      const dTok = document.getElementById('picker-drive-token');
+      if (gIn) gIn.value = gs.geminiApiKey || (state && state.geminiApiKey) || '';
+      if (dUrl) dUrl.value = (gs.driveSync && gs.driveSync.url) || (state && state.driveSync && state.driveSync.url) || '';
+      if (dTok) dTok.value = (gs.driveSync && gs.driveSync.token) || (state && state.driveSync && state.driveSync.token) || '';
+    }
+
+    document.getElementById('btn-toggle-picker-cfg').addEventListener('click', () => {
+      const p = document.getElementById('picker-global-cfg-panel');
+      loadPickerCfgInputs();
+      p.classList.toggle('hidden');
+    });
+
+    document.getElementById('btn-close-picker-cfg').addEventListener('click', () => {
+      document.getElementById('picker-global-cfg-panel').classList.add('hidden');
+    });
+
+    document.getElementById('btn-picker-save-cfg').addEventListener('click', () => {
+      const key = (document.getElementById('picker-gemini-input').value || '').trim();
+      const url = (document.getElementById('picker-drive-url').value || '').trim();
+      const token = (document.getElementById('picker-drive-token').value || '').trim();
+      const curGs = loadGlobalSettings();
+      const newDrive = { ...(curGs.driveSync || {}), url, token };
+      saveGlobalSettings({ geminiApiKey: key, driveSync: newDrive });
+      if (state) {
+        state.geminiApiKey = key;
+        state.driveSync = { ...(state.driveSync || {}), ...newDrive };
+        saveState(true);
+      }
+      const gk = document.getElementById('cfg-gemini-key'); if (gk) gk.value = key;
+      const du = document.getElementById('drive-script-url'); if (du) du.value = url;
+      const dt = document.getElementById('drive-script-token'); if (dt) dt.value = token;
+      renderProfilePickerCards();
+      document.getElementById('picker-global-cfg-panel').classList.add('hidden');
+      showToast('Chave Gemini e Drive salvos globalmente para todos os perfis!', 'success');
+    });
+
+    document.getElementById('btn-picker-pull-drive').addEventListener('click', async () => {
+      const url = (document.getElementById('picker-drive-url').value || '').trim();
+      const token = (document.getElementById('picker-drive-token').value || '').trim();
+      if (!url || !token) {
+        showToast('Preencha a URL do script e a Senha do Drive.', 'warning');
+        return;
+      }
+      saveGlobalSettings({ driveSync: { ...(loadGlobalSettings().driveSync || {}), url, token } });
+      if (state) state.driveSync = { ...(state.driveSync || {}), url, token };
+      const du = document.getElementById('drive-script-url'); if (du) du.value = url;
+      const dt = document.getElementById('drive-script-token'); if (dt) dt.value = token;
+      await syncPullFromDrive();
+    });
       showToast('Perfil removido.', 'info');
     }
 
@@ -2468,9 +2589,9 @@ Direito Previdenciário: Seguridade Social; Segurados; Benefícios; Custeio" cla
           studyLogs: Array.isArray(parsed.studyLogs) ? parsed.studyLogs : [],
           studyMinutesByDay: parsed.studyMinutesByDay || {},
           examDate: parsed.examDate || '',
-          driveSync: { url: '', token: '', autoSync: false, lastSync: '', ...(parsed.driveSync || {}) },
+          driveSync: { url: '', token: '', autoSync: false, lastSync: '', ...(parsed.driveSync || {}), ...(loadGlobalSettings().driveSync || {}) },
           topicHighlights: parsed.topicHighlights || {},
-          geminiApiKey: parsed.geminiApiKey || '',
+          geminiApiKey: loadGlobalSettings().geminiApiKey || parsed.geminiApiKey || '',
           savedReports: Array.isArray(parsed.savedReports) ? parsed.savedReports : [],
           secondCycleDone: parsed.secondCycleDone || {}
         };
@@ -3029,7 +3150,7 @@ Direito Previdenciário: Seguridade Social; Segurados; Benefícios; Custeio" cla
         const secKey = `subj_${subj.id}`;
         const isCollapsed = !!state.collapsedSections[secKey];
         return `
-          <div class="panel-bg rounded-2xl border border-slate-800 p-5">
+          <div class="min-w-0 panel-bg rounded-2xl border border-slate-800 p-5">
             <button type="button" class="btn-toggle-section w-full flex items-center justify-between ${isCollapsed ? '' : 'mb-3 pb-2 border-b border-slate-800'} group" data-sec-key="${secKey}">
               <div class="flex items-center gap-2">
                 <span class="text-xs text-slate-400 group-hover:text-blue-600 transition">${isCollapsed ? '▶' : '▼'}</span>
@@ -3087,7 +3208,7 @@ Direito Previdenciário: Seguridade Social; Segurados; Benefícios; Custeio" cla
         const secKey = `heat_${subj.id}`;
         const isCollapsed = !!state.collapsedSections[secKey];
         return `
-          <div class="panel-bg rounded-2xl border border-slate-800 p-5">
+          <div class="min-w-0 panel-bg rounded-2xl border border-slate-800 p-5">
             <button type="button" class="btn-toggle-section w-full flex items-center justify-between ${isCollapsed ? '' : 'mb-4'} group" data-sec-key="${secKey}">
               <div class="flex items-center gap-2">
                 <span class="text-xs text-slate-400 group-hover:text-blue-600 transition">${isCollapsed ? '▶' : '▼'}</span>
@@ -4360,6 +4481,8 @@ Direito Previdenciário: Seguridade Social; Segurados; Benefícios; Custeio" cla
       state.targetPct = val;
       state.examDate = document.getElementById('cfg-exam-date').value || '';
       state.geminiApiKey = (document.getElementById('cfg-gemini-key').value || '').trim();
+      saveGlobalSettings({ geminiApiKey: state.geminiApiKey });
+      if (typeof renderProfilePickerCards === 'function') renderProfilePickerCards();
       saveState();
       updateSidebarAndKpis();
       showToast('Configurações salvas!', 'success');
@@ -5313,6 +5436,7 @@ Direito Previdenciário: Seguridade Social; Segurados; Benefícios; Custeio" cla
       const token = (document.getElementById('drive-script-token').value || '').trim();
       const autoSync = document.getElementById('drive-auto-sync').checked;
       state.driveSync = { ...(state.driveSync || {}), url, token, autoSync };
+      saveGlobalSettings({ driveSync: state.driveSync });
       saveState(true);
       updateDriveSyncUI();
       return state.driveSync;
@@ -5408,7 +5532,7 @@ Direito Previdenciário: Seguridade Social; Segurados; Benefícios; Custeio" cla
     // HELPER CENTRAL: CHAMADA À API DO GEMINI + COPIAR TEXTO
     // =========================================================================
     async function callGeminiAPI(promptText, expectJson = false) {
-      const key = (state.geminiApiKey || '').trim();
+      const key = (loadGlobalSettings().geminiApiKey || state.geminiApiKey || '').trim();
       if (!key) throw new Error('NO_KEY');
       const body = { contents: [{ parts: [{ text: promptText }] }] };
       if (expectJson) body.generationConfig = { responseMimeType: 'application/json' };
@@ -5516,14 +5640,32 @@ Direito Previdenciário: Seguridade Social; Segurados; Benefícios; Custeio" cla
       document.getElementById('pdf-zoom-label').textContent = `${Math.round(pdfScale * 100)}%`;
     }
 
-    async function extractTextFromPdfDoc(pdfDoc, maxPages = 25, maxChars = 12000) {
+    async function extractTextFromPdfDoc(pdfDoc, maxPages = 35, maxChars = 24000) {
       let out = '';
       const limit = Math.min(pdfDoc.numPages, maxPages);
       for (let i = 1; i <= limit; i++) {
         const p = await pdfDoc.getPage(i);
         const tc = await p.getTextContent();
-        const line = tc.items.map(it => it.str).join(' ').replace(/\s+/g, ' ').trim();
-        if (line) out += `[Pág. ${i}] ${line}\n`;
+        // Reconstrói linhas reais usando a coordenada Y e evita espaços artificiais no meio de palavras
+        let lines = [];
+        let curLine = '';
+        let lastY = null;
+        tc.items.forEach(it => {
+          const str = it.str || '';
+          const y = it.transform ? Math.round(it.transform[5]) : null;
+          if (lastY !== null && y !== null && Math.abs(y - lastY) > 4) {
+            if (curLine.trim()) lines.push(curLine.trim());
+            curLine = str;
+          } else {
+            if (!curLine) curLine = str;
+            else if (str === '' || curLine.endsWith(' ') || str.startsWith(' ')) curLine += str;
+            else curLine += str;
+          }
+          if (y !== null) lastY = y;
+        });
+        if (curLine.trim()) lines.push(curLine.trim());
+        const pageTxt = lines.join('\n').replace(/[ \t]+/g, ' ').trim();
+        if (pageTxt) out += `\n--- PÁGINA ${i} ---\n${pageTxt}\n`;
         if (out.length >= maxChars) break;
       }
       return out.slice(0, maxChars);
@@ -6036,7 +6178,13 @@ Entregue um relatório direto e prático com:
       DEFAULT_SYLLABUS = PROFILES[profileId].syllabus;
       STORAGE_KEY = PROFILES[profileId].storageKey;
       state = loadState();
-      applyProfileHeaderUI();
+      // Migra chave Gemini / Drive de qualquer perfil existente para configuração global única
+    (function migrateGlobalKeys() {
+      const gs = loadGlobalSettings();
+      if (!gs.geminiApiKey && state.geminiApiKey) saveGlobalSettings({ geminiApiKey: state.geminiApiKey });
+      if ((!gs.driveSync || !gs.driveSync.url) && state.driveSync && state.driveSync.url) saveGlobalSettings({ driveSync: state.driveSync });
+    })();
+    applyProfileHeaderUI();
       applyTheme(state.theme || 'light', false);
       initAllSelects();
       updateDriveSyncUI();
@@ -6051,6 +6199,13 @@ Entregue um relatório direto e prático com:
     const PALETTE_COLORS = ['#2dd4bf', '#38bdf8', '#818cf8', '#fbbf24', '#f472b6', '#a78bfa', '#fb923c', '#60a5fa', '#34d399', '#facc15'];
 
     function renderProfilePickerCards() {
+      const gBadge = document.getElementById('picker-gemini-badge');
+      if (gBadge) {
+        const hasG = !!(loadGlobalSettings().geminiApiKey || (state && state.geminiApiKey));
+        gBadge.textContent = hasG
+          ? '✨ Gemini API configurada globalmente (ativa para todos os perfis)'
+          : '💡 Dica: configure a chave Gemini uma única vez em qualquer perfil para ativá-la em todos';
+      }
       const grid = document.getElementById('profile-cards-grid');
       if (!grid) return;
       const list = Object.values(PROFILES);
@@ -6115,35 +6270,82 @@ Entregue um relatório direto e prático com:
     document.getElementById('close-new-profile-modal').addEventListener('click', () => { modalNewProf.classList.add('hidden'); modalNewProf.classList.remove('flex'); });
     document.getElementById('cancel-new-profile-modal').addEventListener('click', () => { modalNewProf.classList.add('hidden'); modalNewProf.classList.remove('flex'); });
 
-    // Leitura automática do PDF do Edital ao anexar no criador de perfil
+    // Leitura automática e inteligente do PDF do Edital (1º passo do criador de perfil)
     document.getElementById('np-edital-pdf').addEventListener('change', async e => {
       const file = e.target.files && e.target.files[0];
       if (!file || !window.pdfjsLib) return;
       const st = document.getElementById('np-pdf-status');
       st.classList.remove('hidden');
-      st.textContent = `Lendo "${file.name}" e extraindo matérias do edital...`;
+      st.style.color = '#7dd3fc';
+      st.textContent = `Lendo "${file.name}"...`;
       try {
         const buf = await file.arrayBuffer();
         const doc = await window.pdfjsLib.getDocument({ data: new Uint8Array(buf) }).promise;
-        const rawText = await extractTextFromPdfDoc(doc, 25, 16000);
+        const rawText = await extractTextFromPdfDoc(doc, 40, 28000);
         if (!rawText) throw new Error('Não foi possível extrair texto deste PDF.');
 
-        // Se tiver chave do Gemini configurada, pede para o Gemini estruturar 100% das matérias e tópicos!
-        if (state.geminiApiKey && state.geminiApiKey.trim()) {
-          st.textContent = '✨ Gemini está organizando todas as matérias e tópicos do seu edital...';
-          const prompt = `Extraia todas as disciplinas e seus tópicos do conteúdo programático deste edital de concurso. Responda APENAS no formato de texto simples (uma disciplina por linha):\nNome da Disciplina: Tópico 1; Tópico 2; Tópico 3\n\nTEXTO DO EDITAL:\n${rawText.slice(0, 14000)}`;
-          const aiOut = await callGeminiAPI(prompt, false);
-          document.getElementById('np-syllabus-text').value = aiOut.trim();
-          st.textContent = '✓ Edital estruturado pelo Gemini! Revise abaixo e clique em "Montar Sistema".';
+        const gKey = (loadGlobalSettings().geminiApiKey || state.geminiApiKey || '').trim();
+        if (gKey) {
+          st.textContent = '✨ Gemini está analisando o edital (órgão, cargo, salário, data da prova e separando todas as matérias)...';
+          const prompt = `Analise o texto deste edital / edital verticalizado de concurso público brasileiro e extraia de forma limpa e organizada:
+1) Nome do órgão/concurso
+2) Cargo
+3) Salário base, vale/benefícios, jornada, data da prova (no formato YYYY-MM-DD se houver, senão vazio) e status
+4) TODAS as disciplinas separadas corretamente com seus respectivos tópicos individuais (remova cabeçalhos de tabela como "T R1 REV Q % Acertos", "Conteúdo Programático", "Page X of Y", "Conhecimentos Básicos").
+
+Responda APENAS com um JSON válido neste formato exato:
+{
+  "name": "Câmara Municipal de ...",
+  "cargo": "...",
+  "salary": "R$ ...",
+  "vale": "R$ ...",
+  "jornada": "30h/sem",
+  "examDate": "YYYY-MM-DD ou vazio",
+  "status": "Edital publicado",
+  "syllabus": [
+    { "subject": "Língua Portuguesa", "topics": ["1. Interpretação de texto", "2. Coesão e coerência"] }
+  ]
+}
+
+TEXTO DO EDITAL:
+${rawText}`;
+          const rawAi = await callGeminiAPI(prompt, true);
+          const parsed = JSON.parse(rawAi.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim());
+          if (parsed.name && !document.getElementById('np-name').value.trim()) document.getElementById('np-name').value = parsed.name;
+          if (parsed.cargo && !document.getElementById('np-cargo').value.trim()) document.getElementById('np-cargo').value = parsed.cargo;
+          if (parsed.salary) document.getElementById('np-salary').value = parsed.salary;
+          if (parsed.vale) document.getElementById('np-vale').value = parsed.vale;
+          if (parsed.jornada) document.getElementById('np-jornada').value = parsed.jornada;
+          if (parsed.examDate && /^\d{4}-\d{2}-\d{2}$/.test(parsed.examDate)) document.getElementById('np-exam-date').value = parsed.examDate;
+          if (parsed.status) document.getElementById('np-status').value = parsed.status;
+          if (Array.isArray(parsed.syllabus) && parsed.syllabus.length) {
+            document.getElementById('np-syllabus-text').value = parsed.syllabus
+              .map(s => `${s.subject}: ${(s.topics || []).join('; ')}`)
+              .join('\n');
+          }
+          st.style.color = '#34d399';
+          st.textContent = `✓ Edital analisado pelo Gemini! ${parsed.syllabus ? parsed.syllabus.length : 0} matérias separadas. Confira e clique em "Montar Sistema".`;
         } else {
-          // Parser local inteligente (extrai linhas/seções do PDF para edição rápida)
-          const lines = rawText.replace(/\[Pág\. \d+\]\s*/g, '\n').split(/\n|(?=[A-ZÁÉÍÓÚÂÊÔÃÕÇ]{4,}[\sA-ZÁÉÍÓÚÂÊÔÃÕÇ]*:)/)
-            .map(l => l.trim()).filter(l => l.length > 5).slice(0, 25);
-          document.getElementById('np-syllabus-text').value = lines.map((l, i) => l.includes(':') ? l : `Matéria ${i + 1}: ${l.slice(0, 120)}`).join('\n');
-          st.textContent = '✓ Texto extraído do PDF! Ajuste no formato "Matéria: Tópico 1; Tópico 2" (ou configure a chave Gemini para extração 100% automática).';
+          // Fallback local melhorado caso ainda não tenha chave Gemini
+          const cleaned = rawText
+            .replace(/--- PÁGINA \d+ ---/g, '\n')
+            .replace(/T\s*R1\s*REV\s*Q\s*%\s*Acertos/gi, '')
+            .replace(/Conteúdo Programático/gi, '')
+            .replace(/Page \d+ of \d+/gi, '');
+          const blocks = cleaned.split(/\n(?=[A-ZÁÉÍÓÚÂÊÔÃÕÇ][A-ZÁÉÍÓÚÂÊÔÃÕÇ\s\/\-]{4,}(?:\n|$))/).map(b => b.trim()).filter(b => b.length > 10);
+          const outLines = blocks.slice(0, 15).map(b => {
+            const parts = b.split('\n').map(x => x.trim()).filter(Boolean);
+            const subj = parts[0].slice(0, 60);
+            const rest = parts.slice(1).join(' ').split(/(?=\d+\.\s+)/).map(t => t.trim()).filter(Boolean);
+            return `${subj}: ${(rest.length ? rest : ['Conteúdo geral']).join('; ')}`;
+          });
+          document.getElementById('np-syllabus-text').value = outLines.join('\n');
+          st.style.color = '#fbbf24';
+          st.textContent = '⚠️ Chave Gemini não encontrada — feito corte local básico. Para análise 100% inteligente (salário, data e matérias exatas), salve sua chave Gemini em "Backup e config.".';
         }
       } catch (err) {
-        st.textContent = 'Erro ao ler PDF: ' + (err.message || 'tente colar o texto das matérias abaixo.');
+        st.style.color = '#fb7185';
+        st.textContent = 'Erro ao ler PDF: ' + (err.message || 'verifique o arquivo.');
       }
       e.target.value = '';
     });
@@ -6207,6 +6409,13 @@ Entregue um relatório direto e prático com:
         }]
       };
 
+      const npExamDate = document.getElementById('np-exam-date').value || '';
+      if (npExamDate) {
+        try {
+          const initSt = { ...createDefaultState(), examDate: npExamDate };
+          localStorage.setItem(newProf.storageKey, JSON.stringify(initSt));
+        } catch (err) {}
+      }
       saveCustomProfileToRegistry(newProf);
       renderProfilePickerCards();
       modalNewProf.classList.add('hidden');
