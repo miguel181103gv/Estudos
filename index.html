@@ -180,7 +180,7 @@
         <div class="pt-2 max-w-2xl mx-auto rounded-2xl bg-[#141c31]/90 border border-slate-700/80 p-3 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 text-left">
           <span id="picker-gemini-badge" class="text-[11px] sm:text-xs font-semibold px-2" style="color:#cbd5e1 !important;"></span>
           <button id="btn-toggle-picker-cfg" type="button" class="px-3.5 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-extrabold transition shrink-0 text-center">
-            ⚙️ Chave Gemini &amp; Google Drive
+            ⚙️ Chave Gemini &amp; Nuvem (Firebase)
           </button>
         </div>
       </div>
@@ -189,7 +189,7 @@
     </div>
   </div>
 
-      <!-- Modal Global de Configuração (Gemini & Drive) -->
+      <!-- Modal Global de Configuração (Gemini & Nuvem Firebase) -->
       <div id="picker-global-cfg-panel" style="display:none;" class="fixed inset-0 z-[80] bg-black/80 backdrop-blur-sm items-center justify-center p-4">
         <div class="w-full max-w-lg rounded-2xl bg-[#141c31] border border-slate-600 p-5 text-left space-y-4 shadow-2xl">
           <div class="flex items-center justify-between border-b border-slate-700 pb-2.5">
@@ -202,20 +202,21 @@
               <input id="picker-gemini-input" type="password" placeholder="Cole sua chave AIzaSy... aqui" style="background:#0f172a !important; color:#ffffff !important; border-color:#334155 !important;" class="w-full rounded-xl border px-3 py-2.5 text-xs outline-none" />
             </div>
             <div>
-              <label class="block text-xs font-semibold mb-1" style="color:#cbd5e1 !important;">☁️ URL do Google Apps Script (termina em /exec)</label>
-              <input id="picker-drive-url" type="url" placeholder="https://script.google.com/macros/s/.../exec" style="background:#0f172a !important; color:#ffffff !important; border-color:#334155 !important;" class="w-full rounded-xl border px-3 py-2.5 text-xs outline-none" />
+              <label class="block text-xs font-semibold mb-1" style="color:#cbd5e1 !important;">🔥 URL do Firebase Realtime Database (Sync em Tempo Real)</label>
+              <input id="picker-drive-url" type="url" placeholder="https://seu-projeto-default-rtdb.firebaseio.com" style="background:#0f172a !important; color:#ffffff !important; border-color:#334155 !important;" class="w-full rounded-xl border px-3 py-2.5 text-xs outline-none" />
+              <p class="text-[10px] mt-1" style="color:#94a3b8 !important;">Grátis na sua conta Google (console.firebase.google.com). Sincroniza a cada clique sem erros.</p>
             </div>
             <div>
-              <label class="block text-xs font-semibold mb-1" style="color:#cbd5e1 !important;">🔒 Senha Secreta do Drive</label>
-              <input id="picker-drive-token" type="password" placeholder="A mesma senha do script" style="background:#0f172a !important; color:#ffffff !important; border-color:#334155 !important;" class="w-full rounded-xl border px-3 py-2.5 text-xs outline-none" />
+              <label class="block text-xs font-semibold mb-1" style="color:#cbd5e1 !important;">🔑 Código / Pasta Pessoal na Nuvem (ex: miguel_trt)</label>
+              <input id="picker-drive-token" type="text" placeholder="Ex: miguel_concursos_2026" style="background:#0f172a !important; color:#ffffff !important; border-color:#334155 !important;" class="w-full rounded-xl border px-3 py-2.5 text-xs outline-none" />
             </div>
           </div>
           <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-700">
             <button id="btn-picker-pull-drive" type="button" class="px-3.5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition">
-              ⬇️ Baixar dados do Drive
+              ⬇️ Puxar da Nuvem agora
             </button>
             <button id="btn-picker-save-cfg" type="button" class="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-extrabold transition">
-              ✓ Salvar para todos os perfis
+              ✓ Salvar e Ativar Tempo Real
             </button>
           </div>
         </div>
@@ -1302,21 +1303,21 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <h3 class="text-sm font-bold text-white flex items-center gap-2">
-              <i data-lucide="cloud" class="w-4 h-4 text-blue-500"></i> Sincronização com Google Drive (PC ↔ iPhone)
+              <i data-lucide="cloud" class="w-4 h-4 text-blue-500"></i> Sincronização em Tempo Real (Firebase · PC ↔ iPhone)
             </h3>
-            <p class="text-xs text-slate-400 mt-0.5">Salve todos os seus estudos, questões, revisões e prints direto na sua conta Google (5 TB).</p>
+            <p class="text-xs text-slate-400 mt-0.5">Salva automaticamente a cada alteração no Firebase da sua conta Google (sem falhas de redirecionamento).</p>
           </div>
           <span id="drive-sync-status" class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 text-[11px] font-medium shrink-0">Não configurado</span>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div class="md:col-span-2">
-            <label class="block text-xs font-semibold text-slate-300 mb-1">URL do Google Apps Script (Web App)</label>
-            <input id="drive-script-url" type="url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-xs text-slate-100 outline-none focus:border-blue-500" />
+            <label class="block text-xs font-semibold text-slate-300 mb-1">URL do Firebase Realtime Database</label>
+            <input id="drive-script-url" type="url" placeholder="https://seu-projeto-default-rtdb.firebaseio.com" class="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-xs text-slate-100 outline-none focus:border-blue-500" />
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Senha Secreta (a mesma do script)</label>
-            <input id="drive-script-token" type="password" placeholder="Ex: minha_senha_trt_2026" class="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-xs text-slate-100 outline-none focus:border-blue-500" />
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Código / Pasta Pessoal</label>
+            <input id="drive-script-token" type="text" placeholder="Ex: miguel_concursos_2026" class="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-xs text-slate-100 outline-none focus:border-blue-500" />
           </div>
         </div>
 
@@ -3866,10 +3867,17 @@
     // =========================================================================
     // NAVIGATION
     // =========================================================================
+    let isApplyingHash = false;
     function switchView(viewName) {
       if (viewName === 'sequence') viewName = 'home';
       state.activeView = viewName;
-      saveState();
+      saveState(true);
+      if (!isApplyingHash) {
+        const targetHash = `#/${currentProfileId}/${viewName}`;
+        if (window.location.hash !== targetHash) {
+          try { history.replaceState(null, '', targetHash); } catch (e) { window.location.hash = targetHash; }
+        }
+      }
 
       document.querySelectorAll('.view-section').forEach(sec => {
         sec.classList.toggle('hidden', sec.id !== `view-${viewName}`);
@@ -5465,18 +5473,24 @@
       isDriveSyncBusy = true;
       try {
         const bundle = buildFullCloudBundle();
-        const res = await fetch(ds.url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({
-            token: ds.token,
-            action: 'save',
-            state: bundle,
-            images: { ...imageCache }
-          })
-        });
-        const data = await res.json();
-        if (!data || !data.ok) throw new Error((data && data.error) || 'Falha ao salvar no Drive');
+        const cleanBase = ds.url.replace(/\/+$/, '');
+        const safeKey = encodeURIComponent((ds.token || 'padrao').replace(/[^a-zA-Z0-9_-]/g, '_'));
+        if (cleanBase.includes('firebaseio.com') || cleanBase.includes('firebasedatabase.app')) {
+          const res = await fetch(`${cleanBase}/sync_${safeKey}.json`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ state: bundle, images: { ...imageCache } })
+          });
+          if (!res.ok) throw new Error('Erro Firebase HTTP ' + res.status);
+        } else {
+          const res = await fetch(ds.url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ token: ds.token, action: 'save', state: bundle, images: { ...imageCache } })
+          });
+          const data = await res.json();
+          if (!data || !data.ok) throw new Error((data && data.error) || 'Falha ao salvar na nuvem');
+        }
         const nowStr = new Date().toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
         state.driveSync.lastSync = nowStr;
         saveGlobalSettings({ driveSync: state.driveSync });
@@ -5504,10 +5518,20 @@
       const stEl = document.getElementById('drive-sync-status');
       if (stEl && !autoMode) stEl.textContent = 'Baixando do Drive...';
       try {
-        const sep = ds.url.includes('?') ? '&' : '?';
-        const res = await fetch(`${ds.url}${sep}action=load&token=${encodeURIComponent(ds.token)}`);
-        const data = await res.json();
-        if (!data || !data.ok) throw new Error((data && data.error) || 'Falha ao ler do Drive');
+        let data = null;
+        const cleanBase = ds.url.replace(/\/+$/, '');
+        const safeKey = encodeURIComponent((ds.token || 'padrao').replace(/[^a-zA-Z0-9_-]/g, '_'));
+        if (cleanBase.includes('firebaseio.com') || cleanBase.includes('firebasedatabase.app')) {
+          const res = await fetch(`${cleanBase}/sync_${safeKey}.json`);
+          if (!res.ok) throw new Error('Erro Firebase HTTP ' + res.status);
+          const fb = await res.json();
+          data = fb ? { ok: true, state: fb.state || null, images: fb.images || {} } : { ok: true, state: null, images: {} };
+        } else {
+          const sep = ds.url.includes('?') ? '&' : '?';
+          const res = await fetch(`${ds.url}${sep}action=load&token=${encodeURIComponent(ds.token)}`);
+          data = await res.json();
+          if (!data || !data.ok) throw new Error((data && data.error) || 'Falha ao ler da nuvem');
+        }
         if (!data.state) {
           if (!autoMode) showToast('Nenhum backup encontrado ainda no Google Drive.', 'info');
           updateDriveSyncUI();
@@ -6460,6 +6484,7 @@ ${rawText}`;
     document.getElementById('btn-open-profile-picker').addEventListener('click', () => {
       renderProfilePickerCards();
       document.getElementById('profile-picker-overlay').classList.remove('hidden');
+      try { history.replaceState(null, '', '#/'); } catch (e) { window.location.hash = '#/'; }
     });
 
     renderProfilePickerCards();
@@ -6520,10 +6545,47 @@ ${rawText}`;
     });
 
     // Init + Carga do Banco IndexedDB (abre mostrando o Seletor de Perfis estilo Netflix!)
-    applyProfileHeaderUI();
-    applyTheme(state.theme || 'light', false);
-    initAllSelects();
-    switchView(state.activeView || 'home');
+    function applyHashRouteOnBoot() {
+      const h = (window.location.hash || '').replace(/^#\/?/, '');
+      const parts = h.split('/').filter(Boolean);
+      if (parts.length >= 1 && PROFILES[parts[0]]) {
+        const pid = parts[0];
+        const view = parts[1] || 'home';
+        currentProfileId = pid;
+        try { localStorage.setItem(LAST_PROFILE_KEY, pid); } catch (e) {}
+        DEFAULT_SYLLABUS = PROFILES[pid].syllabus;
+        STORAGE_KEY = PROFILES[pid].storageKey;
+        state = loadState();
+        isApplyingHash = true;
+        applyProfileHeaderUI();
+        applyTheme(state.theme || 'light', false);
+        initAllSelects();
+        switchView(view);
+        isApplyingHash = false;
+        document.getElementById('profile-picker-overlay').classList.add('hidden');
+        return true;
+      }
+      return false;
+    }
+
+    window.addEventListener('hashchange', () => {
+      const h = (window.location.hash || '').replace(/^#\/?/, '');
+      if (!h) {
+        renderProfilePickerCards();
+        document.getElementById('profile-picker-overlay').classList.remove('hidden');
+      } else {
+        applyHashRouteOnBoot();
+      }
+    });
+
+    if (!applyHashRouteOnBoot()) {
+      applyProfileHeaderUI();
+      applyTheme(state.theme || 'light', false);
+      initAllSelects();
+      isApplyingHash = true;
+      switchView(state.activeView || 'home');
+      isApplyingHash = false;
+    }
     updateTimerAndCountdownUI();
     if (window.lucide && typeof window.lucide.createIcons === 'function') {
       window.lucide.createIcons();
